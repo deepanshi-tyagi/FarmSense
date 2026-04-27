@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file, session
 from predict import predict_crop
 import requests
 import json
@@ -6,14 +6,10 @@ import csv
 import os
 import pandas as pd
 from datetime import datetime
-from flask import send_file, session
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from flask import send_file, session
 from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
 from reportlab.lib.units import inch
 
 app = Flask(__name__)
@@ -51,16 +47,28 @@ CROP_DETAILS = {
 CROP_MARKET_INFO = {
     "rice": {"price": "₹2200 - ₹2800/quintal", "demand": "High"},
     "maize": {"price": "₹1800 - ₹2400/quintal", "demand": "High"},
-    "cotton": {"price": "₹6000 - ₹7500/quintal", "demand": "High"},
-    "banana": {"price": "₹1200 - ₹2500/quintal", "demand": "Medium"},
-    "coffee": {"price": "₹15000 - ₹25000/quintal", "demand": "High"},
-    "pigeonpeas": {"price": "₹7000 - ₹9500/quintal", "demand": "High"},
+    "chickpea": {"price": "₹5000 - ₹7000/quintal", "demand": "High"},
     "kidneybeans": {"price": "₹8000 - ₹12000/quintal", "demand": "Medium"},
+    "pigeonpeas": {"price": "₹7000 - ₹9500/quintal", "demand": "High"},
     "mothbeans": {"price": "₹6000 - ₹8500/quintal", "demand": "Medium"},
+    "mungbean": {"price": "₹7000 - ₹9500/quintal", "demand": "High"},
+    "blackgram": {"price": "₹7000 - ₹10000/quintal", "demand": "High"},
+    "lentil": {"price": "₹5500 - ₹7500/quintal", "demand": "Medium"},
+    "pomegranate": {"price": "₹4000 - ₹9000/quintal", "demand": "High"},
+    "banana": {"price": "₹1200 - ₹2500/quintal", "demand": "Medium"},
+    "mango": {"price": "₹3000 - ₹10000/quintal", "demand": "High"},
+    "grapes": {"price": "₹4000 - ₹12000/quintal", "demand": "High"},
     "watermelon": {"price": "₹800 - ₹1800/quintal", "demand": "Seasonal"},
+    "muskmelon": {"price": "₹1200 - ₹2500/quintal", "demand": "Seasonal"},
+    "apple": {"price": "₹6000 - ₹15000/quintal", "demand": "High"},
+    "orange": {"price": "₹2500 - ₹6000/quintal", "demand": "High"},
+    "papaya": {"price": "₹1500 - ₹3500/quintal", "demand": "Medium"},
+    "coconut": {"price": "₹2500 - ₹4000/quintal", "demand": "High"},
+    "cotton": {"price": "₹6000 - ₹7500/quintal", "demand": "High"},
     "jute": {"price": "₹4000 - ₹5500/quintal", "demand": "Medium"},
-    "coconut": {"price": "₹2500 - ₹4000/quintal", "demand": "High"}
+    "coffee": {"price": "₹15000 - ₹25000/quintal", "demand": "High"}
 }
+
 
 def load_metrics():
     try:
@@ -71,6 +79,19 @@ def load_metrics():
         return None
 
     return None
+
+
+def get_model_chart_data():
+    metrics = load_metrics()
+    model_names = []
+    model_f1_scores = []
+
+    if metrics and "all_models" in metrics:
+        for model_name, values in metrics["all_models"].items():
+            model_names.append(model_name)
+            model_f1_scores.append(values["f1_score"])
+
+    return model_names, model_f1_scores
 
 
 def load_history():
@@ -114,6 +135,34 @@ def get_weather(city):
         "condition": data["weather"][0]["description"],
         "wind_speed": data["wind"]["speed"]
     }
+
+
+def get_fertilizer_recommendation(N, P, K):
+    advice = []
+
+    if N < 50:
+        advice.append("Nitrogen is low. Use urea, compost, or nitrogen-rich fertilizer.")
+    elif N > 100:
+        advice.append("Nitrogen is high. Avoid extra nitrogen fertilizer.")
+    else:
+        advice.append("Nitrogen level is suitable.")
+
+    if P < 40:
+        advice.append("Phosphorus is low. Use DAP or bone meal.")
+    elif P > 80:
+        advice.append("Phosphorus is high. Avoid extra phosphate fertilizer.")
+    else:
+        advice.append("Phosphorus level is suitable.")
+
+    if K < 40:
+        advice.append("Potassium is low. Use MOP or potash fertilizer.")
+    elif K > 80:
+        advice.append("Potassium is high. Avoid extra potassium fertilizer.")
+    else:
+        advice.append("Potassium level is suitable.")
+
+    return advice
+
 
 def attach_crop_details(predictions):
     final_predictions = []
@@ -170,7 +219,6 @@ def filter_predictions(predictions, selected_soil, selected_season, irrigation):
         filtered.append(item)
 
     filtered = sorted(filtered, key=lambda x: x["confidence"], reverse=True)
-
     return filtered[:3]
 
 
@@ -225,65 +273,19 @@ def save_prediction_history(city, N, P, K, ph, rainfall, weather, predictions, s
             predictions[0]["confidence"]
         ])
 
-def get_fertilizer_recommendation(N, P, K):
-    advice = []
-
-    if N < 50:
-        advice.append("Nitrogen is low. Use urea, compost, or nitrogen-rich fertilizer.")
-    elif N > 100:
-        advice.append("Nitrogen is high. Avoid extra nitrogen fertilizer.")
-    else:
-        advice.append("Nitrogen level is suitable.")
-
-    if P < 40:
-        advice.append("Phosphorus is low. Use DAP or bone meal.")
-    elif P > 80:
-        advice.append("Phosphorus is high. Avoid extra phosphate fertilizer.")
-    else:
-        advice.append("Phosphorus level is suitable.")
-
-    if K < 40:
-        advice.append("Potassium is low. Use MOP or potash fertilizer.")
-    elif K > 80:
-        advice.append("Potassium is high. Avoid extra potassium fertilizer.")
-    else:
-        advice.append("Potassium level is suitable.")
-
-    return advice
-
 
 @app.route("/")
 def home():
+    model_names, model_f1_scores = get_model_chart_data()
+
     return render_template(
         "index.html",
         metrics=load_metrics(),
-        history=load_history()
+        history=load_history(),
+        model_names=model_names,
+        model_f1_scores=model_f1_scores
     )
-def get_fertilizer_recommendation(N, P, K):
-    advice = []
 
-    if N < 50:
-        advice.append("Nitrogen is low. Use urea, compost, or nitrogen-rich fertilizer.")
-    elif N > 100:
-        advice.append("Nitrogen is high. Avoid extra nitrogen fertilizer.")
-    else:
-        advice.append("Nitrogen level is suitable.")
-
-    if P < 40:
-        advice.append("Phosphorus is low. Use DAP or bone meal.")
-    elif P > 80:
-        advice.append("Phosphorus is high. Avoid extra phosphate fertilizer.")
-    else:
-        advice.append("Phosphorus level is suitable.")
-
-    if K < 40:
-        advice.append("Potassium is low. Use MOP or potash fertilizer.")
-    elif K > 80:
-        advice.append("Potassium is high. Avoid extra potassium fertilizer.")
-    else:
-        advice.append("Potassium level is suitable.")
-
-    return advice
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -347,22 +349,24 @@ def predict():
         )
 
         session["report_data"] = {
-    "city": city,
-    "weather": weather,
-    "inputs": {
-        "Nitrogen": N,
-        "Phosphorus": P,
-        "Potassium": K,
-        "pH": ph,
-        "Rainfall": rainfall,
-        "Soil Type": soil_type,
-        "Season": season,
-        "Irrigation": irrigation
-    },
-    "predictions": predictions,
-    "fertilizer_advice": fertilizer_advice,
-    "metrics": load_metrics()
-}
+            "city": city,
+            "weather": weather,
+            "inputs": {
+                "Nitrogen": N,
+                "Phosphorus": P,
+                "Potassium": K,
+                "pH": ph,
+                "Rainfall": rainfall,
+                "Soil Type": soil_type,
+                "Season": season,
+                "Irrigation": irrigation
+            },
+            "predictions": predictions,
+            "fertilizer_advice": fertilizer_advice,
+            "metrics": load_metrics()
+        }
+
+        model_names, model_f1_scores = get_model_chart_data()
 
         return render_template(
             "index.html",
@@ -375,25 +379,22 @@ def predict():
             season=season,
             irrigation=irrigation,
             fertilizer_advice=fertilizer_advice,
-            inputs={
-                "N": N,
-                "P": P,
-                "K": K,
-                "ph": ph,
-                "rainfall": rainfall,
-                "soil_type": soil_type,
-                "season": season,
-                "irrigation": irrigation
-            }
+            model_names=model_names,
+            model_f1_scores=model_f1_scores
         )
 
     except Exception as e:
+        model_names, model_f1_scores = get_model_chart_data()
+
         return render_template(
             "index.html",
             error=str(e),
             metrics=load_metrics(),
-            history=load_history()
+            history=load_history(),
+            model_names=model_names,
+            model_f1_scores=model_f1_scores
         )
+
 
 @app.route("/download-report")
 def download_report():
@@ -529,6 +530,7 @@ def download_report():
 
     return send_file(file_path, as_attachment=True)
 
+
 @app.route("/admin")
 def admin_dashboard():
     try:
@@ -609,6 +611,7 @@ def admin_dashboard():
 
     except Exception as e:
         return f"Admin Dashboard Error: {str(e)}"
-    
+
+
 if __name__ == "__main__":
     app.run(debug=True)

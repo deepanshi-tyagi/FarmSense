@@ -6,6 +6,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -14,7 +15,7 @@
 
     <nav class="navbar navbar-dark premium-navbar shadow">
     <div class="container d-flex justify-content-between align-items-center">
-        <span class="navbar-brand fw-bold">🌱 FarmSense AI</span>
+        <span class="navbar-brand fw-bold">🌱 FarmSense</span>
 
         <div>
             <button type="button" onclick="toggleLanguage()" class="btn btn-outline-light btn-sm px-3 fw-bold me-2">
@@ -157,9 +158,13 @@
                     <p><strong>Best Model:</strong> {{ metrics['best_model'] }}</p>
                     <p><strong>F1 Score:</strong> {{ metrics['best_f1_score'] }}%</p>
 
-                    <img src="{{ url_for('static', filename='charts/model_comparison.png') }}"
-                         class="img-fluid mt-2 rounded chart-img"
-                         alt="Model Comparison Chart">
+                <div class="model-score-card">
+    <p>
+        Naive Bayes performed best based on weighted F1-score.
+    </p>
+</div>
+
+<canvas id="modelChart"></canvas>  
                 </div>
                 {% endif %}
 
@@ -277,6 +282,44 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<script>
+    const modelNames = {{ model_names | tojson }};
+    const modelScores = {{ model_f1_scores | tojson }};
+
+    if (document.getElementById("modelChart")) {
+        new Chart(document.getElementById("modelChart"), {
+            type: "bar",
+            data: {
+                labels: modelNames,
+                datasets: [{
+                    label: "F1 Score (%)",
+                    data: modelScores,
+                    borderWidth: 1,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 90,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
