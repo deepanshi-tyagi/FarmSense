@@ -437,7 +437,7 @@ def download_report():
 
     story = []
 
-    story.append(Paragraph("FarmSense AI - Crop Recommendation Report", title_style))
+    story.append(Paragraph("FarmSense - Crop Recommendation Report", title_style))
     story.append(Paragraph("AI-powered crop recommendation using soil data, weather data, and machine learning.", normal_style))
     story.append(Spacer(1, 0.2 * inch))
 
