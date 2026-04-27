@@ -6,9 +6,11 @@ import csv
 import os
 import pandas as pd
 from datetime import datetime
+from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-
+from reportlab.lib import colors
+from reportlab.lib.units import inch
 
 app = Flask(__name__)
 app.secret_key = "farmsense_secret_key"
