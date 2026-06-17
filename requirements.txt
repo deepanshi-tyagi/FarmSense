@@ -1,7 +1,13 @@
-flask
+Flask
 pandas
 numpy
+scipy
 scikit-learn
+joblib
+python-dotenv
 requests
-matplotlib
 reportlab
+Pillow
+matplotlib
+seaborn
+plotly
