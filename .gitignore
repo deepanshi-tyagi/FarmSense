@@ -1,9 +1,20 @@
+# Virtual environment
 venv/
 .env
+
+# Python cache
 __pycache__/
 *.pyc
-*.pkl
-*.csv
-.env
-prediction_history.csv
-*.pdf
+*.pyo
+
+# Database / local files
+*.db
+database.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

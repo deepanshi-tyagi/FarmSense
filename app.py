@@ -15,7 +15,7 @@ from reportlab.lib.units import inch
 app = Flask(__name__)
 app.secret_key = "farmsense_secret_key"
 
-API_KEY = "af1e04d1b97ba06f14aaa5d742cf3f82"
+API_KEY = "OPENWEATHER_API_KEY"
 HISTORY_FILE = "prediction_history.csv"
 
 
