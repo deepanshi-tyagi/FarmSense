@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>FarmSense</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ static_version }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -15,15 +16,15 @@
 
     <nav class="navbar navbar-dark premium-navbar shadow">
     <div class="container d-flex justify-content-between align-items-center">
-        <span class="navbar-brand fw-bold">🌱 FarmSense</span>
+        <a class="navbar-brand fw-bold text-white" href="/">FarmSense</a>
 
         <div>
             <button type="button" onclick="toggleLanguage()" class="btn btn-outline-light btn-sm px-3 fw-bold me-2">
-                🌐 हिंदी / English
+                हिंदी / English
             </button>
 
             <a href="/admin" class="btn btn-outline-light btn-sm px-4 fw-bold">
-                📊 Dashboard
+                Dashboard
             </a>
         </div>
     </div>
@@ -34,14 +35,13 @@
 
         <div class="container text-center hero-content">
             <span class="badge bg-light text-success mb-3 px-3 py-2">AI + Weather + Smart Farming</span>
-        <h1 data-en="Smart Crop Recommendation System" data-hi="स्मार्ट फसल सुझाव प्रणाली">
-    Smart Crop Recommendation System
+        <h1 data-en="FarmSense — Intelligent Crop Recommendations" data-hi="FarmSense — स्मार्ट फसल सुझाव">
+    FarmSense — Intelligent Crop Recommendations
 </h1>
 
-<p data-en="Predict suitable crops using soil nutrients, weather data, ML confidence and rule-based intelligence."
-   data-hi="मिट्टी के पोषक तत्वों, मौसम डेटा, मशीन लर्निंग और नियम-आधारित प्रणाली से उपयुक्त फसल का सुझाव प्राप्त करें।">
-   Predict suitable crops using soil nutrients, weather data, confidence and rule-based intelligence.
-</p>   
+<p data-en="Predict suitable crops using soil nutrients, weather data, and expert rules." data-hi="मिट्टी, मौसम, और विशेषज्ञ नियमों के आधार पर उपयुक्त फसल सुझाएं।">
+   Predict suitable crops using soil nutrients, weather data, and expert rules.
+</p>
         </div>
     </section>
 
@@ -58,9 +58,9 @@
             <div class="col-lg-6">
                 <div class="card premium-card p-4 fade-up">
 
-                  <h3 class="mb-3" data-en="🌾 Enter Farm Details" data-hi="🌾 खेत की जानकारी दर्ज करें">
-                    🌾 Enter Farm Details
-                            </h3>         
+                                    <h3 class="mb-3" data-en="Enter Farm Details" data-hi="खेत की जानकारी दर्ज करें">
+                                        Enter Farm Details
+                                                        </h3>         
 
                     <form action="/predict" method="POST" id="predictionForm">
                      <div id="validationBox" class="validation-box d-none"></div>
@@ -116,15 +116,14 @@
                         </select>
 
                         <button class="btn premium-btn w-100" type="submit"
-                             data-en="🚀 Predict Crop"
-                             data-hi="🚀 फसल बताएं">
-                                 🚀 Predict Crop
+                             data-en="Predict Crop"
+                             data-hi="फसल बताएं">
+                                 Predict Crop
                             </button>
 
                     <button type="button" onclick="fillRandom()" class="btn btn-outline-success w-100 mt-2 rounded-pill"
-                        data-en="🎲 Try Random Input"
-                        data-hi="🎲 रैंडम इनपुट भरें">
-                            🎲 Try Random Input
+                        data-en="Try Random Input" data-hi="रैंडम इनपुट भरें">
+                            Try Random Input
                                 </button>    
                     </form>
 
@@ -139,8 +138,8 @@
             <div class="col-lg-6">
 
                 {% if weather %}
-                <div class="card premium-card p-4 mb-4 fade-up">
-                   <h3 data-en="🌦 Weather Info" data-hi="🌦 मौसम जानकारी">🌦 Weather Info</h3> 
+                     <div class="card premium-card p-4 mb-4 fade-up">
+                         <h3 data-en="Weather Info" data-hi="मौसम जानकारी">Weather Info</h3> 
 
                     <div class="info-grid">
                         <div><span>City</span><strong>{{ weather['city'] }}</strong></div>
@@ -154,7 +153,7 @@
 
                 {% if metrics %}
                 <div class="card premium-card p-4 fade-up">
-                    <h3 data-en="📊 Model Performance" data-hi="📊 मॉडल प्रदर्शन">📊 Model Performance</h3>
+                    <h3 data-en="Model Performance" data-hi="मॉडल प्रदर्शन">Model Performance</h3>
                     <p><strong>Best Model:</strong> {{ metrics['best_model'] }}</p>
                     <p><strong>F1 Score:</strong> {{ metrics['best_f1_score'] }}%</p>
 
@@ -173,14 +172,14 @@
 
         {% if explanation %}
         <div class="card premium-card p-4 mt-4 fade-up">
-         <h3 data-en="🧠 Prediction Explanation" data-hi="🧠 भविष्यवाणी का कारण">🧠 Prediction Explanation</h3>  
+         <h3 data-en="Prediction Explanation" data-hi="भविष्यवाणी का कारण">Prediction Explanation</h3>  
             <p>{{ explanation }}</p>
         </div>
         {% endif %}
 
         {% if fertilizer_advice %}
         <div class="card premium-card p-4 mt-4 fade-up">
-         <h3 data-en="🌱 Fertilizer Recommendation" data-hi="🌱 उर्वरक सुझाव">🌱 Fertilizer Recommendation</h3>   
+         <h3 data-en="Fertilizer Recommendation" data-hi="उर्वरक सुझाव">Fertilizer Recommendation</h3>   
 
             <ul class="list-group premium-list">
                 {% for advice in fertilizer_advice %}
@@ -193,8 +192,8 @@
         {% if prediction %}
         <div class="card premium-card p-4 mt-4 fade-up">
 
-            <h3 data-en="🌾 Top 3 Crops" data-hi="🌾 शीर्ष 3 फसलें">🌾 Top 3 Crops</h3>
-            <p class="text-muted">AI prediction enhanced with soil, season & irrigation logic.</p>
+            <h3 data-en="Top 3 Crops" data-hi="शीर्ष 3 फसलें">Top 3 Crops</h3>
+            <p class="text-muted">AI-enhanced recommendations combined with soil, season & irrigation logic.</p>
 
             <div class="row g-4">
                 {% for item in prediction %}
@@ -232,7 +231,7 @@
 
             <div class="text-center mt-4">
                 <a href="/download-report" class="btn premium-btn px-5">
-                    📄 Download PDF Report
+                    Download PDF Report
                 </a>
             </div>
 
@@ -241,7 +240,7 @@
 
         {% if history %}
         <div class="card premium-card p-4 mt-4 fade-up">
-          <h3 data-en="📜 Recent Predictions" data-hi="📜 हाल की भविष्यवाणियाँ">📜 Recent Predictions</h3>
+          <h3 data-en="Recent Predictions" data-hi="हाल की भविष्यवाणियाँ">Recent Predictions</h3>
 
             <div class="table-responsive">
                 <table class="table table-hover premium-table">
@@ -276,14 +275,18 @@
     </div>
 
     <footer class="footer">
-        <p>FarmSense -> Crop Recommendation System</p>
+        <div class="container text-center">
+            <p class="mb-0">© FarmSense — Crop Recommendation System</p>
+            <small class="text-muted">Built for practical, local farm decision support.</small>
+        </div>
     </footer>
 
 </div>
 
-<button class="assistant-toggle" id="assistantToggle" type="button"
-        aria-label="Open FarmSense Assistant" aria-expanded="false">
-    <span aria-hidden="true">AI</span>
+<button class="assistant-toggle" id="assistantToggle" type="button" aria-label="Open FarmSense Assistant" aria-expanded="false">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
 </button>
 
 <section class="assistant-panel" id="assistantPanel" aria-label="FarmSense Assistant" hidden>
@@ -311,7 +314,7 @@
     <p class="assistant-note">General guidance only. Verify important decisions with a local agricultural expert.</p>
 </section>
 
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}?v={{ static_version }}"></script>
 
 <script>
     const modelNames = {{ model_names | tojson }};

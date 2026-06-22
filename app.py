@@ -18,6 +18,21 @@ from reportlab.lib.units import inch
 load_dotenv(override=True)
 
 
+import time
+
+def get_static_version():
+    try:
+        css_path = os.path.join("static", "css", "style.css")
+        if os.path.exists(css_path):
+            return str(int(os.path.getmtime(css_path)))
+    except Exception:
+        pass
+    return str(int(time.time()))
+
+
+STATIC_VERSION = get_static_version()
+
+
 def get_flask_secret_key():
     secret_key = os.getenv("FLASK_SECRET_KEY")
     if secret_key:
@@ -280,7 +295,8 @@ def home():
         metrics=load_metrics(),
         history=load_history(),
         model_names=model_names,
-        model_f1_scores=model_f1_scores
+        model_f1_scores=model_f1_scores,
+        static_version=STATIC_VERSION
     )
 
 
@@ -390,7 +406,8 @@ def predict():
             irrigation=irrigation,
             fertilizer_advice=fertilizer_advice,
             model_names=model_names,
-            model_f1_scores=model_f1_scores
+            model_f1_scores=model_f1_scores,
+            static_version=STATIC_VERSION
         )
 
     except Exception as e:
@@ -402,7 +419,8 @@ def predict():
             metrics=load_metrics(),
             history=load_history(),
             model_names=model_names,
-            model_f1_scores=model_f1_scores
+            model_f1_scores=model_f1_scores,
+            static_version=STATIC_VERSION
         )
 
 
@@ -556,7 +574,8 @@ def admin_dashboard():
                 city_chart_labels=[],
                 city_chart_values=[],
                 trend_chart_labels=[],
-                trend_chart_values=[]
+                trend_chart_values=[],
+                static_version=STATIC_VERSION
             )
 
         df = pd.read_csv(HISTORY_FILE)
@@ -573,7 +592,8 @@ def admin_dashboard():
                 city_chart_labels=[],
                 city_chart_values=[],
                 trend_chart_labels=[],
-                trend_chart_values=[]
+                trend_chart_values=[],
+                static_version=STATIC_VERSION
             )
 
         df["city"] = df["city"].astype(str).str.strip()
@@ -616,7 +636,8 @@ def admin_dashboard():
             city_chart_labels=city_chart_labels,
             city_chart_values=city_chart_values,
             trend_chart_labels=trend_chart_labels,
-            trend_chart_values=trend_chart_values
+            trend_chart_values=trend_chart_values,
+            static_version=STATIC_VERSION
         )
 
     except Exception as e:

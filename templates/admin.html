@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>FarmSense Admin Dashboard</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ static_version }}">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -14,11 +15,9 @@
 
 <nav class="navbar navbar-dark premium-navbar shadow">
     <div class="container d-flex justify-content-between align-items-center">
-        <span class="navbar-brand fw-bold">📊 FarmSense Admin Dashboard</span>
+        <a class="navbar-brand fw-bold text-white" href="/">FarmSense Admin</a>
 
-        <a href="/" class="btn btn-outline-light btn-sm px-4 fw-bold">
-            🌱 Home
-        </a>
+        <a href="/" class="btn btn-outline-light btn-sm px-4 fw-bold">Home</a>
     </div>
 </nav>
 
@@ -53,14 +52,14 @@
 
         <div class="col-lg-6">
             <div class="card premium-card p-4">
-                <h4>🌾 Crop Distribution</h4>
+                <h4>Crop Distribution</h4>
                 <canvas id="cropChart"></canvas>
             </div>
         </div>
 
         <div class="col-lg-6">
             <div class="card premium-card p-4">
-                <h4>📍 City Usage</h4>
+                <h4>City Usage</h4>
                 <canvas id="cityChart"></canvas>
             </div>
         </div>
@@ -68,12 +67,12 @@
     </div>
 
     <div class="card premium-card p-4 mt-4">
-        <h4>📈 Prediction Trend Over Time</h4>
+        <h4>Prediction Trend Over Time</h4>
         <canvas id="trendChart"></canvas>
     </div>
 
     <div class="card premium-card p-4 mt-4">
-        <h3>📍 City-wise Usage Table</h3>
+        <h3>City-wise Usage Table</h3>
 
         <div class="table-responsive">
             <table class="table table-hover premium-table">
@@ -97,7 +96,7 @@
     </div>
 
     <div class="card premium-card p-4 mt-4 mb-5">
-        <h3>📜 Recent Predictions</h3>
+        <h3>Recent Predictions</h3>
 
         <div class="table-responsive">
             <table class="table table-hover premium-table">
