@@ -331,3 +331,79 @@ body {
 #modelChart {
     max-height: 330px;
 }
+
+/* Offline assistant */
+.assistant-toggle {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1040;
+    width: 58px;
+    height: 58px;
+    border: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #13783f, #35b968);
+    color: white;
+    font-weight: 800;
+    box-shadow: 0 12px 28px rgba(9, 92, 43, 0.35);
+}
+
+.assistant-panel {
+    position: fixed;
+    right: 24px;
+    bottom: 94px;
+    z-index: 1040;
+    width: min(380px, calc(100vw - 32px));
+    overflow: hidden;
+    border: 1px solid #cfe8d0;
+    border-radius: 20px;
+    background: white;
+    box-shadow: 0 22px 55px rgba(15, 72, 38, 0.25);
+}
+
+.assistant-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    background: #13783f;
+    color: white;
+}
+
+.assistant-header small { display: block; opacity: 0.85; }
+.assistant-header button { border: 0; background: transparent; color: white; font-size: 28px; line-height: 1; }
+
+.assistant-messages {
+    height: 310px;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f5fbf6;
+}
+
+.assistant-message {
+    width: fit-content;
+    max-width: 88%;
+    margin-bottom: 10px;
+    padding: 10px 13px;
+    border-radius: 15px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.assistant-message.bot { background: white; border: 1px solid #d8ebdb; }
+.assistant-message.user { margin-left: auto; background: #168047; color: white; }
+.assistant-message.waiting { color: #66756a; font-style: italic; }
+
+.assistant-suggestions { display: flex; gap: 7px; padding: 10px 14px 0; overflow-x: auto; }
+.assistant-suggestions button { border: 1px solid #9fd4ad; border-radius: 20px; background: #effaf2; color: #116a37; white-space: nowrap; }
+
+.assistant-form { display: flex; gap: 8px; padding: 12px 14px 8px; }
+.assistant-form input { min-width: 0; flex: 1; border: 1px solid #cfe0d2; border-radius: 12px; padding: 10px 12px; }
+.assistant-form button { border: 0; border-radius: 12px; padding: 0 16px; background: #168047; color: white; font-weight: 700; }
+.assistant-note { margin: 0; padding: 0 14px 12px; color: #66756a; font-size: 11px; }
+
+@media (max-width: 480px) {
+    .assistant-toggle { right: 16px; bottom: 16px; }
+    .assistant-panel { right: 16px; bottom: 84px; }
+    .assistant-messages { height: 45vh; }
+}

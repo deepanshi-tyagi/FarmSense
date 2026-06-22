@@ -22,7 +22,66 @@ document.addEventListener("DOMContentLoaded", function () {
 
     revealOnScroll();
     window.addEventListener("scroll", revealOnScroll);
+    initializeAssistant();
 });
+
+
+function initializeAssistant() {
+    const toggle = document.getElementById("assistantToggle");
+    const panel = document.getElementById("assistantPanel");
+    const close = document.getElementById("assistantClose");
+    const form = document.getElementById("assistantForm");
+    const input = document.getElementById("assistantInput");
+    const messages = document.getElementById("assistantMessages");
+    if (!toggle || !panel || !form) return;
+
+    const setOpen = (open) => {
+        panel.hidden = !open;
+        toggle.setAttribute("aria-expanded", String(open));
+        if (open) input.focus();
+    };
+
+    toggle.addEventListener("click", () => setOpen(panel.hidden));
+    close.addEventListener("click", () => setOpen(false));
+
+    const addMessage = (text, sender) => {
+        const bubble = document.createElement("div");
+        bubble.className = `assistant-message ${sender}`;
+        bubble.textContent = text;
+        messages.appendChild(bubble);
+        messages.scrollTop = messages.scrollHeight;
+        return bubble;
+    };
+
+    const ask = async (question) => {
+        const cleanQuestion = question.trim();
+        if (!cleanQuestion) return;
+        addMessage(cleanQuestion, "user");
+        input.value = "";
+        const waiting = addMessage("Thinking...", "bot waiting");
+
+        try {
+            const response = await fetch("/api/assistant", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: cleanQuestion })
+            });
+            const data = await response.json();
+            waiting.textContent = response.ok ? data.reply : (data.error || "Please try again.");
+        } catch (error) {
+            waiting.textContent = "The assistant is unavailable. Please check that FarmSense is running.";
+        }
+        waiting.classList.remove("waiting");
+    };
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        ask(input.value);
+    });
+    panel.querySelectorAll("[data-question]").forEach((button) => {
+        button.addEventListener("click", () => ask(button.dataset.question));
+    });
+}
 
 
 function validateInputsLive() {

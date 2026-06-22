@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, send_file, session
+from flask import Flask, jsonify, render_template, request, send_file, session
+from dotenv import load_dotenv
+from assistant import answer_question
 from predict import predict_crop
-import requests
+from weather import get_weather
 import json
 import csv
 import os
+import secrets
 import pandas as pd
 from datetime import datetime
 from reportlab.lib.pagesizes import A4
@@ -12,10 +15,28 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-app = Flask(__name__)
-app.secret_key = "farmsense_secret_key"
+load_dotenv(override=True)
 
-API_KEY = "OPENWEATHER_API_KEY"
+
+def get_flask_secret_key():
+    secret_key = os.getenv("FLASK_SECRET_KEY")
+    if secret_key:
+        return secret_key
+
+    if os.getenv("FLASK_ENV", "development").lower() == "production":
+        raise RuntimeError("FLASK_SECRET_KEY must be set in production.")
+
+    # Safe for local development; sessions reset whenever the process restarts.
+    return secrets.token_hex(32)
+
+
+app = Flask(__name__)
+app.config.update(
+    SECRET_KEY=get_flask_secret_key(),
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=os.getenv("FLASK_ENV", "development").lower() == "production",
+)
 HISTORY_FILE = "prediction_history.csv"
 
 
@@ -111,30 +132,6 @@ def load_history():
 
     except Exception:
         return []
-
-
-def get_weather(city):
-    url = "https://api.openweathermap.org/data/2.5/weather"
-
-    params = {
-        "q": city.strip(),
-        "appid": API_KEY,
-        "units": "metric"
-    }
-
-    response = requests.get(url, params=params, timeout=10)
-    data = response.json()
-
-    if response.status_code != 200:
-        raise Exception(data.get("message", "Weather API error"))
-
-    return {
-        "city": city,
-        "temperature": data["main"]["temp"],
-        "humidity": data["main"]["humidity"],
-        "condition": data["weather"][0]["description"],
-        "wind_speed": data["wind"]["speed"]
-    }
 
 
 def get_fertilizer_recommendation(N, P, K):
@@ -285,6 +282,19 @@ def home():
         model_names=model_names,
         model_f1_scores=model_f1_scores
     )
+
+
+@app.route("/api/assistant", methods=["POST"])
+def assistant_api():
+    data = request.get_json(silent=True) or {}
+    message = str(data.get("message", "")).strip()
+
+    if not message:
+        return jsonify({"error": "Please enter a question."}), 400
+    if len(message) > 500:
+        return jsonify({"error": "Please keep your question under 500 characters."}), 400
+
+    return jsonify({"reply": answer_question(message)})
 
 
 @app.route("/predict", methods=["POST"])

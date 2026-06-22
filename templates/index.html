@@ -281,6 +281,36 @@
 
 </div>
 
+<button class="assistant-toggle" id="assistantToggle" type="button"
+        aria-label="Open FarmSense Assistant" aria-expanded="false">
+    <span aria-hidden="true">AI</span>
+</button>
+
+<section class="assistant-panel" id="assistantPanel" aria-label="FarmSense Assistant" hidden>
+    <header class="assistant-header">
+        <div>
+            <strong>FarmSense Assistant</strong>
+            <small>Offline agricultural guidance</small>
+        </div>
+        <button id="assistantClose" type="button" aria-label="Close assistant">&times;</button>
+    </header>
+    <div class="assistant-messages" id="assistantMessages" aria-live="polite">
+        <div class="assistant-message bot">Namaste! Ask me about crops, soil, seasons, irrigation, fertilizer, or pH.</div>
+    </div>
+    <div class="assistant-suggestions">
+        <button type="button" data-question="Tell me about rice">Rice</button>
+        <button type="button" data-question="Which crops suit black soil?">Black soil</button>
+        <button type="button" data-question="Explain NPK fertilizer">NPK</button>
+    </div>
+    <form class="assistant-form" id="assistantForm">
+        <label class="visually-hidden" for="assistantInput">Ask an agricultural question</label>
+        <input id="assistantInput" maxlength="500" autocomplete="off"
+               placeholder="Ask about crops or soil..." required>
+        <button type="submit">Send</button>
+    </form>
+    <p class="assistant-note">General guidance only. Verify important decisions with a local agricultural expert.</p>
+</section>
+
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 <script>
