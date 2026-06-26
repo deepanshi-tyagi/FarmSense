@@ -46,9 +46,8 @@ An intelligent agricultural recommendation system powered by machine learning. H
    ```bash
    python app.py
    ```
-
-Access at `http://localhost:5000`
-
+  http://127.0.0.1:5000
+  
 ## Project Structure
 
 ```
